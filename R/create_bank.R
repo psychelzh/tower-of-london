@@ -10,14 +10,14 @@ create_bank <- function(graph) {
     mutate(across(c(from, to), parse_number)) |>
     filter(from != to) |>
     mutate(
-      pattern_id1 = (from %/% 10 - to %/% 10) %% 6,
-      pattern_id2 = paste0(from %% 10, to %% 10),
-      pattern_id = paste(pattern_id1, pattern_id2, sep = "_"),
+      type1_raw = (from %/% 10 - to %/% 10) %% 6,
+      type1 = if_else(type1_raw > 3, 6 - type1_raw, type1_raw),
+      type2 = paste0(from %% 10, to %% 10),
+      type = paste(type1, type2, sep = "_"),
       time = level * 10
     ) |>
     group_by(level) |>
-    mutate(type = dense_rank(pattern_id)) |>
+    mutate(type_id = dense_rank(type)) |>
     ungroup() |>
-    select(from, to, level, type, time) |>
-    arrange(level, type)
+    arrange(level, type_id, type)
 }
