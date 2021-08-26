@@ -16,7 +16,7 @@ create_bank <- function(graph) {
       )
     ) |>
     group_by(min_move) |>
-    mutate(type_id = dense_rank(path_type)) |>
+    mutate(type = dense_rank(path_type), .keep = "unused") |>
     ungroup() |>
     mutate(across(c(from, to), parse_number))
 }
