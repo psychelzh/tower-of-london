@@ -3,20 +3,28 @@
 #' @title
 #' @param graph
 create_bank <- function(graph) {
-  graph |>
-    distances() |>
-    as_tibble(rownames = "from") |>
-    pivot_longer(-from, names_to = "to", values_to = "min_move") |>
-    mutate(across(c(from, to), parse_number)) |>
-    filter(from != to) |>
+  nodes <- names(V(graph))
+  expand_grid(from = nodes, to = nodes) |>
     mutate(
-      type1_raw = (from %/% 10 - to %/% 10) %% 6,
-      type1 = if_else(type1_raw > 3, 6 - type1_raw, type1_raw),
-      type2 = paste0(from %% 10, to %% 10),
-      type = paste(type1, type2, sep = "_")
+      min_move = map2_dbl(from, to, distances, graph = graph),
+      path_type = map2_chr(
+        from, to,
+        ~ graph |>
+          all_shortest_paths(.x, .y) |>
+          pluck("res") |>
+          parse_path_type()
+      )
     ) |>
     group_by(min_move) |>
-    mutate(type_id = dense_rank(type)) |>
+    mutate(type_id = dense_rank(path_type)) |>
     ungroup() |>
-    arrange(min_move, type_id, type)
+    mutate(across(c(from, to), parse_number))
+}
+
+parse_path_type <- function(paths) {
+  path_parsed <- map_chr(
+    paths,
+    ~ str_c(parse_number(names(.x)) %% 10, collapse = "-")
+  )
+  str_c(sort(path_parsed), collapse = "_")
 }
