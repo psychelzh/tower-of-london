@@ -1,6 +1,4 @@
-#' .. content for \description{} (no empty lines) ..
-#'
-#' .. content for \details{} ..
+#' Output Data to an Excel File
 #'
 #' @title
 #' @param data
