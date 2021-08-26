@@ -1,8 +1,8 @@
 #' Select Items
 #'
 #' The selected all starts from configuration identifier ending with 5 (or say,
-#' flat type). Tasks are selected from those with minimal moves from 3 to 7, and
-#' 4 tasks for each type of move.
+#' flat type). Tasks are selected from those with minimal moves from 4 to 7, and
+#' 5 tasks for each type of move.
 #'
 #' @title
 #' @param item_bank
@@ -12,7 +12,7 @@
 select_items <- function(item_bank) {
   set.seed(1)
   item_bank |>
-    filter(min_move %in% 3:7, from %% 10 == 5) |>
+    filter(min_move %in% 4:7, from %% 10 == 5) |>
     group_nest(min_move, type) |>
     group_by(min_move) |>
     group_modify(
